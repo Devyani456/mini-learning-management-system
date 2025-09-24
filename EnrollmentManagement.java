@@ -1,50 +1,40 @@
 package features;
 
-import java.util.ArrayList;
 import models.CourseModel;
 import models.LoginModel;
 import models.User;
+import util.Utils;
 
 public class EnrollmentManagement {
-    private ArrayList<User> users;
 
-    public EnrollmentManagement(ArrayList<User> users) {
-        this.users = users;
+    public User register(String username, String email, String phone, String password, String type) {
+        User u = new User(Utils.generateUserId(), username, email, phone, password, type);
+        Utils.addUser(u);
+        return u;
     }
 
-    // Register new user
-    public void register(User user) {
-        users.add(user);
-        System.out.println("Registered user: " + user.getUsername());
-    }
-
-    // Login
-    public User login(LoginModel login) {
-        for (User u : users) {
-            if (u.getEmail().equals(login.getEmail()) && u.getPassword().equals(login.getPassword())) {
-                System.out.println("Login successful: " + u.getUsername());
-                return u;
-            }
+    public User login(LoginModel lm) {
+        User u = Utils.findUserByEmail(lm.email);
+        if (u != null && u.password.equals(lm.password)) {
+            return u;
         }
-        System.out.println("Invalid login");
         return null;
     }
 
-    // Enroll student in course
-    public void enrollCourse(User student, CourseModel course) {
-        if (student.getUserType().equals("student")) {
-            student.getCourses().add(course);
-            System.out.println("Enrolled " + student.getUsername() + " in " + course.getCourseName());
+    public boolean enroll(String studentId, String courseId) {
+        User u = Utils.findUserById(studentId);
+        CourseModel c = Utils.findCourseById(courseId);
+        if (u != null && c != null && u.userType.equals("student")) {
+            return u.addCourse(c);
         }
+        return false;
     }
 
-    // Remove course from student
-    public void removeCourse(User student, int courseId) {
-        boolean removed = student.getCourses().removeIf(c -> c.getCourseId() == courseId);
-        if (removed) {
-            System.out.println("Removed course ID " + courseId + " from " + student.getUsername());
-        } else {
-            System.out.println("Course ID " + courseId + " not found in " + student.getUsername() + "'s enrollments.");
+    public boolean unenroll(String studentId, String courseId) {
+        User u = Utils.findUserById(studentId);
+        if (u != null && u.userType.equals("student")) {
+            return u.removeCourse(courseId);
         }
+        return false;
     }
 }
