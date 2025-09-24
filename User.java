@@ -1,32 +1,45 @@
 package models;
 
-import java.util.ArrayList;
-
 public class User {
-    private int userId;
-    private String username;
-    private String email;
-    private String phone;
-    private String password;
-    private String userType; // "admin" or "student"
-    private ArrayList<CourseModel> courses;
+    public String userId;
+    public String username;
+    public String email;
+    public String phone;
+    public String password;
+    public String userType; // "admin" or "student"
+    public CourseModel[] courses; // enrolled courses
+    public int courseCount;
 
-    public User(int userId, String username, String email, String phone, String password, String userType) {
+    public User(String userId, String username, String email, String phone, String password, String userType) {
         this.userId = userId;
         this.username = username;
         this.email = email;
         this.phone = phone;
         this.password = password;
         this.userType = userType;
-        this.courses = new ArrayList<>();
+        this.courses = new CourseModel[10]; // max 10 courses
+        this.courseCount = 0;
     }
 
-    // Getters & Setters
-    public int getUserId() { return userId; }
-    public String getUsername() { return username; }
-    public String getEmail() { return email; }
-    public String getPhone() { return phone; }
-    public String getPassword() { return password; }
-    public String getUserType() { return userType; }
-    public ArrayList<CourseModel> getCourses() { return courses; }
+    public boolean addCourse(CourseModel c) {
+        if (courseCount < courses.length) {
+            courses[courseCount++] = c;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeCourse(String courseId) {
+        for (int i = 0; i < courseCount; i++) {
+            if (courses[i] != null && courses[i].courseId != null && courses[i].courseId.equals(courseId)) {
+                // shift left
+                for (int j = i; j < courseCount - 1; j++) {
+                    courses[j] = courses[j + 1];
+                }
+                courses[--courseCount] = null;
+                return true;
+            }
+        }
+        return false;
+    }
 }
