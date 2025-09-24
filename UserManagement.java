@@ -1,30 +1,26 @@
 package features;
 
-import java.util.ArrayList;
 import models.User;
+import util.Utils;
 
 public class UserManagement {
-    private ArrayList<User> users;
 
-    public UserManagement(ArrayList<User> users) {
-        this.users = users;
+    public User addStudent(String username, String email, String phone, String password) {
+        User u = new User(Utils.generateUserId(), username, email, phone, password, "student");
+        Utils.addUser(u);
+        return u;
     }
 
-    // Add Student
-    public void addStudent(User student) {
-        users.add(student);
-        System.out.println("Student added: " + student.getUsername());
-    }
-
-    // Delete Student
-    public void deleteStudent(String email) {
-        boolean removed = users.removeIf(u -> u.getEmail().equals(email) && u.getUserType().equals("student"));
-        if (removed) {
-            System.out.println("Student deleted with email: " + email);
-        } else {
-            System.out.println("No student found with email: " + email);
+    public boolean deleteStudent(String userId) {
+        for (int i = 0; i < Utils.userCount; i++) {
+            if (Utils.users[i].userId.equals(userId) && Utils.users[i].userType.equals("student")) {
+                for (int j = i; j < Utils.userCount - 1; j++) {
+                    Utils.users[j] = Utils.users[j + 1];
+                }
+                Utils.users[--Utils.userCount] = null;
+                return true;
+            }
         }
+        return false;
     }
-
-    public ArrayList<User> getUsers() { return users; }
 }
